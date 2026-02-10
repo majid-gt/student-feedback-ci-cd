@@ -1,0 +1,29 @@
+name: CI - Build and Push docker images
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Login to Docker hub
+              run: |
+                docker login \
+                    -u ${{secrets.DOCKERHUB_USERNAME}}
+                    -p ${{secrets.DOCKERHUB_TOKEN}}
+            
+            - name: Build and push backend image
+              run: |
+                docker build -t ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-backend:latest ./backend
+                docker push ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-backend:latest
+
+            - name: Build and push frontend image
+              run: |
+                docker build -t ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-frontend:latest ./frontend
+                docker push ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-frontend:latest
