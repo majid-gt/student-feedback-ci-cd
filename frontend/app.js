@@ -1,6 +1,3 @@
-const API_URL = window.API_URL || "http://backend:8000/api/feedback"; 
-// later you will change this to backend container / nginx route
-
 async function submitFeedback() {
     const name = document.getElementById("name").value;
     const feedback = document.getElementById("feedback").value;
@@ -10,7 +7,7 @@ async function submitFeedback() {
         return;
     }
 
-    await fetch(API_URL, {
+    await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, feedback })
@@ -23,7 +20,7 @@ async function submitFeedback() {
 }
 
 async function loadFeedback() {
-    const res = await fetch(API_URL);
+    const res = await fetch("/api/feedback");
     const data = await res.json();
 
     const list = document.getElementById("feedbackList");
