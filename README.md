@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🚀 Student Feedback Application  
-## Production Deployment with CI/CD
+## Production-Grade Deployment with CI/CD Automation
 
 <br/>
 
@@ -23,28 +23,23 @@
 
 ---
 
+# 🔥 Why This Project Matters
 
+✔ Fully Automated CI/CD Pipeline  
+✔ Containerized Two-Tier Architecture  
+✔ Production-Ready HTTPS Deployment  
+✔ Zero Manual Deployment After Push  
+✔ Secure Reverse Proxy Configuration  
+✔ Backend Not Publicly Exposed  
+✔ Infrastructure & Application Separation  
 
-# 📌 Project Overview
-
-This project demonstrates a **production-ready deployment** of a two-tier Student Feedback Application using modern DevOps practices.
-
-### Application Components
-
-- 🎨 Frontend (Static UI served via NGINX)
-- 🟢 Backend (Node.js API)
-- 🌐 Reverse Proxy (NGINX)
-- 🐳 Containerization (Docker & Docker Compose)
-- 🔄 CI/CD Pipeline (GitHub Actions)
-- ☁ Secure Deployment on AWS EC2 with HTTPS
-
-> 🎯 Entire workflow is automated from code commit to production deployment.
+> Code push → Docker build → Image push → SSH deploy → Live in production.
 
 ---
 
 # 🏗 Architecture Overview
 
-## CI/CD Flow
+## CI/CD Automation Flow
 
 ```
 Developer Push
@@ -102,54 +97,104 @@ Backend Container
 
 ---
 
-# 🛠 Technologies Used
+# 🛠 Core Technologies
 
-## ☁ Cloud & Infrastructure
-
+## ☁ Infrastructure
 - AWS EC2 (Ubuntu)
 - Elastic IP
-- Custom Domain (DNS Configured)
+- Custom Domain
 - Let’s Encrypt (Certbot)
 
 ## 🐳 Containerization
-
 - Docker
 - Docker Compose
-- Docker Hub (Image Registry)
+- Docker Hub
 
 ## 🔄 CI/CD
-
 - GitHub Actions
 - docker/login-action
 - appleboy/ssh-action
 
 ## 🧩 Application Layer
-
-- Node.js (Backend API)
+- Node.js Backend API
 - Static Frontend
 - NGINX Reverse Proxy
 
 ---
 
-# 🔄 CI/CD Pipeline
+# 🚀 Implementation Steps (Manual Deployment)
+
+## 1️⃣ Launch EC2 (Ubuntu)
+
+## 2️⃣ Install Docker
+
+```bash
+sudo apt update
+```
+
+```bash
+sudo apt install docker.io -y
+```
+
+```bash
+sudo systemctl enable docker
+```
+
+---
+
+## 3️⃣ Install Docker Compose
+
+```bash
+sudo apt install docker-compose -y
+```
+
+---
+
+## 4️⃣ Clone Repository
+
+```bash
+git clone <your-repository-url>
+```
+
+```bash
+cd student-feedback-ci-cd
+```
+
+---
+
+## 5️⃣ Generate SSL Certificate
+
+```bash
+sudo certbot --nginx -d yourdomain.com
+```
+
+---
+
+## 6️⃣ Start Application
+
+```bash
+docker compose up -d
+```
+
+---
+
+# 🔄 CI/CD Pipeline Breakdown
 
 ## ✅ Continuous Integration (CI)
 
 Triggered on every push to `main`:
 
-1. Checkout repository
-2. Login to Docker Hub
-3. Build backend Docker image
-4. Build frontend Docker image
-5. Push images to Docker Hub
+- Checkout repository  
+- Login to Docker Hub  
+- Build backend Docker image  
+- Build frontend Docker image  
+- Push images to Docker Hub  
 
 ---
 
 ## 🚀 Continuous Deployment (CD)
 
-After images are pushed:
-
-GitHub Actions connects to EC2 via SSH and runs:
+After image push:
 
 ```bash
 docker compose pull
@@ -159,9 +204,8 @@ docker compose pull
 docker compose up -d
 ```
 
-Containers are automatically updated.
-
-> 🔥 No manual deployment required.
+✔ Containers updated automatically  
+✔ No manual SSH deployment needed  
 
 ---
 
@@ -175,8 +219,8 @@ Production `docker-compose.yml` includes:
 
 ### Security Model
 
-- Only NGINX exposes ports 80 and 443
-- Backend remains internal
+- Only NGINX exposes ports 80 & 443  
+- Backend remains internal  
 - Containers use:
 
 ```yaml
@@ -187,35 +231,28 @@ restart: always
 
 # 🔐 Security & Production Readiness
 
-- HTTPS enabled via Let’s Encrypt
-- SSL termination at reverse proxy
-- Backend not publicly exposed
-- Containers auto-restart
-- Secure SSH-based deployment
-- No credentials stored in repository
-- GitHub Secrets used for sensitive data
+- HTTPS enabled via Let’s Encrypt  
+- SSL termination at reverse proxy  
+- Backend not publicly exposed  
+- SSH-based deployment  
+- GitHub Secrets for credentials  
+- Containers auto-restart  
 
 ---
 
 # 🌍 Domain & SSL Setup
 
 ## DNS Configuration
+- A record → EC2 Elastic IP
 
-- A record mapped to EC2 Elastic IP
-
-## Generate SSL Certificate
+## SSL Generation
 
 ```bash
-sudo certbot certonly --nginx -d kcmkcmkcmkcmkcmkcmkcm.dpdns.org(you domain url)
+sudo certbot certonly --nginx -d yourdomain.com
 ```
 
-## Mount Certificates in NGINX Container
-
-Configured inside `nginx.conf` and Docker volumes.
-
-## Force HTTPS Redirect
-
-NGINX configured to redirect HTTP → HTTPS automatically.
+## HTTPS Redirect
+Configured in `nginx.conf` to force HTTP → HTTPS.
 
 ---
 
@@ -242,73 +279,25 @@ student-feedback-ci-cd/
 
 ---
 
-# 🚀 Manual Deployment Steps (Without CI/CD)
+# 📈 DevOps Concepts Demonstrated
 
-## 1️⃣ Launch EC2 Instance (Ubuntu)
-
-## 2️⃣ Install Docker
-
-```bash
-sudo apt update
-```
-
-```bash
-sudo apt install docker.io -y
-```
-
-```bash
-sudo systemctl enable docker
-```
-
-## 3️⃣ Install Docker Compose
-
-```bash
-sudo apt install docker-compose -y
-```
-
-## 4️⃣ Clone Repository
-
-```bash
-git clone <your-repository-url>
-```
-
-```bash
-cd student-feedback-ci-cd
-```
-
-## 5️⃣ Generate SSL Certificate
-
-```bash
-sudo certbot --nginx -d kcmkcmkcmkcmkcmkcmkcm.dpdns.org(your domain url)
-```
-
-## 6️⃣ Start Application
-
-```bash
-docker compose up -d
-```
-
----
-
-# 📈 Key DevOps Concepts Demonstrated
-
-- Infrastructure automation
-- Reverse proxy configuration
-- Containerized microservice-style architecture
-- Secure CI/CD pipeline
-- Automated deployment via SSH
-- Cross-environment consistency
-- Separation of application & infrastructure concerns
+- Infrastructure Automation  
+- Reverse Proxy Design  
+- Containerized Architecture  
+- Secure CI/CD  
+- Automated Remote Deployment  
+- Environment Consistency  
+- Application & Infrastructure Separation  
 
 ---
 
 # 🎯 Future Improvements
 
-- Use version tagging instead of `latest`
-- Add health checks in Docker Compose
-- Implement zero-downtime deployments
-- Add monitoring (Prometheus / CloudWatch)
-- Migrate to Kubernetes for scalability
+- Version tagging instead of `latest`
+- Health checks in Docker Compose
+- Zero-downtime deployments
+- Monitoring (Prometheus / CloudWatch)
+- Kubernetes migration
 
 ---
 
@@ -323,4 +312,4 @@ AWS | Docker | CI/CD | Linux | NGINX
 
 # 📜 License
 
-This project is intended for educational and portfolio demonstration purposes.
+Educational & Portfolio Demonstration Project
