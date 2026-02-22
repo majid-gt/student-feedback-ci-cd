@@ -1,29 +1,24 @@
 <div align="center">
 
-# 🚀 Student Feedback Application  
-## Production-Grade Deployment with CI/CD Automation
+# Student Feedback Application  
 
-<br/>
+<img src="https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws&logoColor=white" />
+<img src="https://img.shields.io/badge/Node.js-18-green?logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/NGINX-Reverse%20Proxy-brightgreen?logo=nginx&logoColor=white" />
+<img src="https://img.shields.io/badge/PM2-Process%20Manager-blue?logo=pm2&logoColor=white" />
+<img src="https://img.shields.io/badge/SSL-Let's%20Encrypt-red?logo=letsencrypt&logoColor=white" />
 
-<div style="display: flex; justify-content: center; align-items: center; gap: 40px;">
-
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" width="110"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="110"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="110"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg" width="110"/>
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="110"/>
+### Production-Grade Deployment with CI/CD Automation
 
 </div>
 
-<br/>
 
-### ☁ AWS • 🐳 Docker • 🔄 GitHub Actions • 🌐 NGINX • 🟢 Node.js
 
 </div>
 
 ---
 
-# 🔥 Why This Project Matters
+### Why This Project Matters
 
 ✔ Fully Automated CI/CD Pipeline  
 ✔ Containerized Two-Tier Architecture  
@@ -37,9 +32,9 @@
 
 ---
 
-# 🏗 Architecture Overview
+## Architecture Overview
 
-## CI/CD Automation Flow
+### CI/CD Automation Flow
 
 ```
 Developer Push
@@ -74,7 +69,7 @@ Frontend & Backend Containers
 
 ---
 
-## 🌍 Production Traffic Flow
+### Production Traffic Flow
 
 ```
 User
@@ -97,36 +92,36 @@ Backend Container
 
 ---
 
-# 🛠 Core Technologies
+## Core Technologies
 
-## ☁ Infrastructure
+### Infrastructure
 - AWS EC2 (Ubuntu)
 - Elastic IP
 - Custom Domain
 - Let’s Encrypt (Certbot)
 
-## 🐳 Containerization
+### Containerization
 - Docker
 - Docker Compose
 - Docker Hub
 
-## 🔄 CI/CD
+### CI/CD
 - GitHub Actions
 - docker/login-action
 - appleboy/ssh-action
 
-## 🧩 Application Layer
+### Application Layer
 - Node.js Backend API
 - Static Frontend
 - NGINX Reverse Proxy
 
 ---
 
-# 🚀 Implementation Steps (Manual Deployment)
+## Implementation Steps (Manual Deployment)
 
-## 1️⃣ Launch EC2 (Ubuntu)
+### Launch EC2 (Ubuntu)
 
-## 2️⃣ Install Docker
+### Install Docker
 
 ```bash
 sudo apt update
@@ -142,7 +137,7 @@ sudo systemctl enable docker
 
 ---
 
-## 3️⃣ Install Docker Compose
+### Install Docker Compose
 
 ```bash
 sudo apt install docker-compose -y
@@ -150,7 +145,7 @@ sudo apt install docker-compose -y
 
 ---
 
-## 4️⃣ Clone Repository
+### Clone Repository
 
 ```bash
 git clone <your-repository-url>
@@ -162,7 +157,7 @@ cd student-feedback-ci-cd
 
 ---
 
-## 5️⃣ Generate SSL Certificate
+### Generate SSL Certificate
 
 ```bash
 sudo certbot --nginx -d yourdomain.com
@@ -170,7 +165,7 @@ sudo certbot --nginx -d yourdomain.com
 
 ---
 
-## 6️⃣ Start Application
+### Start Application
 
 ```bash
 docker compose up -d
@@ -178,9 +173,9 @@ docker compose up -d
 
 ---
 
-# 🔄 CI/CD Pipeline Breakdown
+## CI/CD Pipeline Breakdown
 
-## ✅ Continuous Integration (CI)
+### Continuous Integration (CI)
 
 Triggered on every push to `main`:
 
@@ -192,7 +187,7 @@ Triggered on every push to `main`:
 
 ---
 
-## 🚀 Continuous Deployment (CD)
+### Continuous Deployment (CD)
 
 After image push:
 
@@ -209,7 +204,7 @@ docker compose up -d
 
 ---
 
-# 🐳 Docker Architecture
+## Docker Architecture
 
 Production `docker-compose.yml` includes:
 
@@ -229,7 +224,7 @@ restart: always
 
 ---
 
-# 🔐 Security & Production Readiness
+## Security & Production Readiness
 
 - HTTPS enabled via Let’s Encrypt  
 - SSL termination at reverse proxy  
@@ -240,23 +235,23 @@ restart: always
 
 ---
 
-# 🌍 Domain & SSL Setup
+## Domain & SSL Setup
 
-## DNS Configuration
+### DNS Configuration
 - A record → EC2 Elastic IP
 
-## SSL Generation
+### SSL Generation
 
 ```bash
 sudo certbot certonly --nginx -d yourdomain.com
 ```
 
-## HTTPS Redirect
+### HTTPS Redirect
 Configured in `nginx.conf` to force HTTP → HTTPS.
 
 ---
 
-# 📂 Project Structure
+## Project Structure
 
 ```
 student-feedback-ci-cd/
@@ -279,7 +274,7 @@ student-feedback-ci-cd/
 
 ---
 
-# 📈 DevOps Concepts Demonstrated
+### DevOps Concepts Demonstrated
 
 - Infrastructure Automation  
 - Reverse Proxy Design  
@@ -291,25 +286,15 @@ student-feedback-ci-cd/
 
 ---
 
-# 🎯 Future Improvements
+### Author
 
-- Version tagging instead of `latest`
-- Health checks in Docker Compose
-- Zero-downtime deployments
-- Monitoring (Prometheus / CloudWatch)
-- Kubernetes migration
-
----
-
-# 👨‍💻 Author
-
-## Md Majid  
-### DevOps & SRE Enthusiast  
+#### Md Majid  
+#### DevOps & SRE Enthusiast  
 
 AWS | Docker | CI/CD | Linux | NGINX  
 
 ---
 
-# 📜 License
+### License
 
 Educational & Portfolio Demonstration Project
