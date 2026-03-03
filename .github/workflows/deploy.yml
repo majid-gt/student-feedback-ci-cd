@@ -31,3 +31,25 @@ jobs:
                 context: ./frontend
                 push: true
                 tags: ${{ secrets.DOCKERHUB_USERNAME }}/student-feedback-frontend:${{ github.sha }}
+            
+            - name: Checkout k8s repo
+              uses: actions/checkout@v4
+              with:
+                repository: majid-gt/student-feedback-k8s
+                token: ${{ secrets.GH_PAT }}
+                path: k8s-repo
+
+            - name: Update image tags in k8s manifests
+              run: |
+                cd k8s-repo/k8s
+                sed -i "s|student-feedback-backend:.*|student-feedback-backend:${{ github.sha }}|" backend-deployment.yml
+                sed -i "s|student-feedback-frontend:.*|student-feedback-frontend:${{ github.sha }}|" frontend-deployment.yml
+
+            - name: Commit and push changes
+              run: |
+                cd k8s-repo
+                git config user.name "github-actions"
+                git config user.email "actions@github.com"
+                git add .
+                git commit -m "Update image tags to ${{ github.sha }}"
+                git push
