@@ -1,3 +1,5 @@
+const API_BASE = "http://localhost:8000";
+
 async function submitFeedback() {
     const name = document.getElementById("name").value;
     const feedback = document.getElementById("feedback").value;
@@ -7,7 +9,7 @@ async function submitFeedback() {
         return;
     }
 
-    await fetch("/api/feedback", {
+    await fetch(`${API_BASE}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, feedback })
@@ -20,7 +22,7 @@ async function submitFeedback() {
 }
 
 async function loadFeedback() {
-    const res = await fetch("/api/feedback");
+    const res = await fetch(`${API_BASE}/api/feedback`);
     const data = await res.json();
 
     const list = document.getElementById("feedbackList");

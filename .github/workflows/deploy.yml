@@ -18,23 +18,16 @@ jobs:
                 username: ${{ secrets.DOCKERHUB_USERNAME }}
                 password: ${{ secrets.DOCKERHUB_TOKEN }}
                   
-            - name: Build and push backend image
-              run: |
-                docker build -t ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-backend:latest ./backend
-                docker push ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-backend:latest
-
-            - name: Build and push frontend image
-              run: |
-                docker build -t ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-frontend:latest ./frontend
-                docker push ${{secrets.DOCKERHUB_USERNAME}}/student-feedback-frontend:latest
-
-            - name: Deploy to EC2
-              uses: appleboy/ssh-action@v1.0.3
+            - name: Build and Push Backend Image
+              uses: docker/build-push-action@v5
               with:
-                host: ${{ secrets.EC2_HOST }}
-                username: ${{ secrets.EC2_USER }}
-                key: ${{ secrets.EC2_SSH_KEY }}
-                script: |
-                  cd student-feedback
-                  docker compose pull
-                  docker compose up -d
+                context: ./backend
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/student-feedback-backend:latest
+
+            - name: Build and Push Frontend Image
+              uses: docker/build-push-action@v5
+              with:
+                context: ./frontend
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/student-feedback-frontend:latest
