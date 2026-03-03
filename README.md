@@ -1,73 +1,62 @@
 <div align="center">
 
-# Student Feedback Application  
+## Student Feedback Application
 
-<img src="https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws&logoColor=white" />
-<img src="https://img.shields.io/badge/Node.js-18-green?logo=nodedotjs&logoColor=white" />
-<img src="https://img.shields.io/badge/NGINX-Reverse%20Proxy-brightgreen?logo=nginx&logoColor=white" />
-<img src="https://img.shields.io/badge/PM2-Process%20Manager-blue?logo=pm2&logoColor=white" />
-<img src="https://img.shields.io/badge/SSL-Let's%20Encrypt-red?logo=letsencrypt&logoColor=white" />
+<img src="https://img.shields.io/badge/Kubernetes-k3s-blue?logo=kubernetes&logoColor=white" />
+<img src="https://img.shields.io/badge/ArgoCD-GitOps-orange?logo=argo&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-15-blue?logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Docker-Hub-2496ED?logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Cert--Manager-Let's%20Encrypt-red?logo=letsencrypt&logoColor=white" />
 
-### Production-Grade Deployment with CI/CD Automation
-
-</div>
-
-
+Production-Grade 3-Tier Kubernetes Deployment with GitOps Automation
 
 </div>
 
 ---
 
-### Why This Project Matters
+## Project Overview
 
-✔ Fully Automated CI/CD Pipeline  
-✔ Containerized Two-Tier Architecture  
-✔ Production-Ready HTTPS Deployment  
-✔ Zero Manual Deployment After Push  
-✔ Secure Reverse Proxy Configuration  
-✔ Backend Not Publicly Exposed  
-✔ Infrastructure & Application Separation  
+The Student Feedback Application is a containerized full-stack web application deployed on Kubernetes using a GitOps workflow powered by ArgoCD.
 
-> Code push → Docker build → Image push → SSH deploy → Live in production.
+The system follows a 3-tier architecture:
+
+- Frontend (Static Web Application)
+- Backend (Node.js REST API)
+- Database (PostgreSQL with Persistent Storage)
+
+Deployment workflow:
+
+Code Push → GitHub Actions → Docker Build → Image Push → K8s Manifest Update → ArgoCD Sync → Live Deployment
+
+This project demonstrates production-grade DevOps practices including containerization, Kubernetes orchestration, GitOps-based deployment, TLS automation, and persistent storage management.
 
 ---
 
 ## Architecture Overview
 
-### CI/CD Automation Flow
+### GitOps Deployment Flow
 
 ```
-Developer Push
-      │
-      ▼
-GitHub Repository
-      │
-      ▼
+Developer Push (App Repo)
+        │
+        ▼
 GitHub Actions (CI)
-      │
-      ▼
-Build Docker Images
-      │
-      ▼
-Push to Docker Hub
-      │
-      ▼
-GitHub Actions (CD via SSH)
-      │
-      ▼
-AWS EC2
-      │
-      ▼
-Docker Compose Pull & Restart
-      │
-      ▼
-NGINX Reverse Proxy
-      │
-      ▼
-Frontend & Backend Containers
+        │
+        ▼
+Build Docker Images (Tagged with Commit SHA)
+        │
+        ▼
+Push Images to Docker Hub
+        │
+        ▼
+Update Kubernetes Manifests (K8s Repo)
+        │
+        ▼
+ArgoCD Detects Change
+        │
+        ▼
+Automatic Kubernetes Deployment
 ```
-
----
 
 ### Production Traffic Flow
 
@@ -75,19 +64,22 @@ Frontend & Backend Containers
 User
   │
   ▼
-Domain (DNS → Elastic IP)
+Domain (DNS → VM Public IP)
   │
   ▼
-AWS EC2
+k3s Cluster (GCP VM)
   │
   ▼
-NGINX (Reverse Proxy + SSL Termination)
+Traefik Ingress Controller
   │
   ▼
-Frontend Container
+Frontend Service
   │
   ▼
-Backend Container
+Backend Service
+  │
+  ▼
+PostgreSQL (Persistent Volume)
 ```
 
 ---
@@ -95,206 +87,340 @@ Backend Container
 ## Core Technologies
 
 ### Infrastructure
-- AWS EC2 (Ubuntu)
-- Elastic IP
-- Custom Domain
-- Let’s Encrypt (Certbot)
+- GCP VM (Ubuntu 22.04)
+- k3s (Lightweight Kubernetes)
+- Traefik Ingress Controller
+- cert-manager with Let's Encrypt
 
-### Containerization
-- Docker
-- Docker Compose
-- Docker Hub
-
-### CI/CD
+### GitOps & CI/CD
 - GitHub Actions
-- docker/login-action
-- appleboy/ssh-action
+- Docker Hub
+- ArgoCD
+- Git-based declarative deployments
 
-### Application Layer
-- Node.js Backend API
+### Application Stack
+- Node.js Backend
 - Static Frontend
-- NGINX Reverse Proxy
+- PostgreSQL Database
+- Kubernetes Deployments & Services
 
 ---
 
-## Implementation Steps (Manual Deployment)
+# Complete Deployment Guide (Step-by-Step)
 
-### Launch EC2 (Ubuntu)
-
-### Install Docker
-
-```bash
-sudo apt update
-```
-
-```bash
-sudo apt install docker.io -y
-```
-
-```bash
-sudo systemctl enable docker
-```
+This guide explains how to deploy the entire project from scratch.
 
 ---
 
-### Install Docker Compose
+## 1. Prerequisites
 
-```bash
-sudo apt install docker-compose -y
-```
+You must have:
 
----
-
-### Clone Repository
-
-```bash
-git clone <your-repository-url>
-```
-
-```bash
-cd student-feedback-ci-cd
-```
+- GitHub account
+- Docker Hub account
+- GCP account (or AWS EC2 alternative)
+- Domain name (for HTTPS)
+- SSH client installed
 
 ---
 
-### Generate SSL Certificate
+## 2. Create a Virtual Machine
 
-```bash
-sudo certbot --nginx -d yourdomain.com
+### On GCP
+
+Create a VM with:
+
+- OS: Ubuntu 22.04 LTS
+- Machine Type: e2-medium (2 vCPU, 4GB RAM recommended)
+- Boot Disk: 20GB minimum
+- Allow HTTP Traffic
+- Allow HTTPS Traffic
+
+Open firewall ports:
+
+```
+22   (SSH)
+80   (HTTP)
+443  (HTTPS)
 ```
 
 ---
 
-### Start Application
+## 3. SSH Into the VM
 
-```bash
-docker compose up -d
+```
+ssh <username>@<VM_PUBLIC_IP>
 ```
 
 ---
 
-## CI/CD Pipeline Breakdown
+## 4. Install k3s (Kubernetes)
 
-### Continuous Integration (CI)
-
-Triggered on every push to `main`:
-
-- Checkout repository  
-- Login to Docker Hub  
-- Build backend Docker image  
-- Build frontend Docker image  
-- Push images to Docker Hub  
-
----
-
-### Continuous Deployment (CD)
-
-After image push:
-
-```bash
-docker compose pull
+```
+curl -sfL https://get.k3s.io | sh -
 ```
 
-```bash
-docker compose up -d
+Verify installation:
+
+```
+sudo kubectl get nodes
 ```
 
-✔ Containers updated automatically  
-✔ No manual SSH deployment needed  
+Configure kubectl for non-root usage:
 
----
-
-## Docker Architecture
-
-Production `docker-compose.yml` includes:
-
-- nginx (reverse proxy & SSL termination)
-- frontend container
-- backend container
-
-### Security Model
-
-- Only NGINX exposes ports 80 & 443  
-- Backend remains internal  
-- Containers use:
-
-```yaml
-restart: always
+```
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
 ```
 
 ---
 
-## Security & Production Readiness
+## 5. Install cert-manager
 
-- HTTPS enabled via Let’s Encrypt  
-- SSL termination at reverse proxy  
-- Backend not publicly exposed  
-- SSH-based deployment  
-- GitHub Secrets for credentials  
-- Containers auto-restart  
-
----
-
-## Domain & SSL Setup
-
-### DNS Configuration
-- A record → EC2 Elastic IP
-
-### SSL Generation
-
-```bash
-sudo certbot certonly --nginx -d yourdomain.com
+```
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 ```
 
-### HTTPS Redirect
-Configured in `nginx.conf` to force HTTP → HTTPS.
+Wait until all pods are running:
+
+```
+kubectl get pods -n cert-manager
+```
 
 ---
 
-## Project Structure
+## 6. Install ArgoCD
+
+Create namespace:
+
+```
+kubectl create namespace argocd
+```
+
+Install ArgoCD:
+
+```
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+Verify installation:
+
+```
+kubectl get pods -n argocd
+```
+
+---
+
+## 7. Expose ArgoCD (Temporary NodePort)
+
+```
+kubectl patch svc argocd-server -n argocd \
+  -p '{"spec": {"type": "NodePort"}}'
+```
+
+Get NodePort:
+
+```
+kubectl get svc -n argocd
+```
+
+Access ArgoCD:
+
+```
+http://<VM_PUBLIC_IP>:<NODEPORT>
+```
+
+Get admin password:
+
+```
+kubectl -n argocd get secret argocd-initial-admin-secret \
+-o jsonpath="{.data.password}" | base64 -d && echo
+```
+
+Username: `admin`
+
+---
+
+## 8. Configure DNS
+
+Create an A record:
+
+```
+yourdomain.com → <VM_PUBLIC_IP>
+```
+
+Wait for DNS propagation.
+
+---
+
+## 9. Deploy the Application via ArgoCD
+
+Clone the Kubernetes repository:
+
+```
+git clone https://github.com/majid-gt/student-feedback-k8s.git
+cd student-feedback-k8s
+```
+
+Apply the ArgoCD application manifest:
+
+```
+kubectl apply -f argocd/application.yml
+```
+
+ArgoCD will automatically:
+
+- Create namespace
+- Deploy PostgreSQL
+- Create PersistentVolumeClaim
+- Deploy backend
+- Deploy frontend
+- Configure Ingress
+- Generate TLS certificate
+
+---
+
+## 10. Verify Deployment
+
+Check ArgoCD application:
+
+```
+kubectl get applications -n argocd
+```
+
+Check application pods:
+
+```
+kubectl get pods -n student-feedback
+```
+
+Check certificates:
+
+```
+kubectl get certificate -n student-feedback
+```
+
+Access the application:
+
+```
+https://yourdomain.com
+```
+
+---
+
+# CI/CD Automation
+
+## App Repository Workflow
+
+On every push to `main`:
+
+- Build backend image (tagged with commit SHA)
+- Build frontend image
+- Push images to Docker Hub
+- Update image tags in Kubernetes repo
+- Commit and push manifest changes
+
+## GitOps Behavior
+
+ArgoCD:
+
+- Monitors Kubernetes repository
+- Detects manifest changes
+- Performs rolling deployment
+- Maintains revision history
+- Enables rollback
+
+---
+
+# Kubernetes Design
+
+### Namespace Isolation
+
+All resources are deployed under:
+
+```
+student-feedback
+```
+
+### Persistent Storage
+
+PostgreSQL uses:
+
+```
+PersistentVolumeClaim (1Gi)
+```
+
+### Rolling Updates
+
+Each new image creates a new ReplicaSet.
+Older versions remain available for rollback.
+
+---
+
+# Security & Production Features
+
+- HTTPS via Let's Encrypt
+- Automatic certificate renewal
+- Kubernetes Secrets for credentials
+- Backend not publicly exposed
+- Ingress-based routing
+- Immutable container images
+- Commit-based versioning
+- Declarative infrastructure
+- Git-controlled deployments
+
+---
+
+# Capabilities
+
+- Fully automated GitOps deployment
+- Zero manual deployment after push
+- 3-tier production architecture
+- Persistent database storage
+- Automatic TLS provisioning
+- Rolling updates with rollback support
+- Namespace isolation
+- Commit-based image tagging
+- Infrastructure and application separation
+
+---
+
+# Repository Structure
 
 ```
 student-feedback-ci-cd/
 │
 ├── frontend/
-│   └── Dockerfile
-│
 ├── backend/
-│   └── Dockerfile
+├── .github/workflows/
 │
-├── nginx/
-│   └── nginx.conf
+student-feedback-k8s/
 │
-├── docker-compose.yml
+├── k8s/
+│   ├── namespace.yml
+│   ├── postgres-deployment.yml
+│   ├── postgres-service.yml
+│   ├── postgres-pvc.yml
+│   ├── backend-deployment.yml
+│   ├── frontend-deployment.yml
+│   ├── ingress.yml
 │
-└── .github/
-    └── workflows/
-        └── deploy.yml
+└── argocd/
+    └── application.yml
 ```
 
 ---
 
-### DevOps Concepts Demonstrated
+## Author
 
-- Infrastructure Automation  
-- Reverse Proxy Design  
-- Containerized Architecture  
-- Secure CI/CD  
-- Automated Remote Deployment  
-- Environment Consistency  
-- Application & Infrastructure Separation  
+Md Majid  
+DevOps & SRE Enthusiast  
+
+Kubernetes | GitOps | Docker | CI/CD | Cloud Infrastructure
 
 ---
 
-### Author
-
-#### Md Majid  
-#### DevOps & SRE Enthusiast  
-
-AWS | Docker | CI/CD | Linux | NGINX  
-
----
-
-### License
+## License
 
 Educational & Portfolio Demonstration Project
