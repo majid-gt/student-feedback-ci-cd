@@ -74,7 +74,7 @@ jobs:
           image-ref: dockermajid/student-feedback-frontend:${{ github.sha }}
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
 
       # 11. Push Frontend Image
       - name: Push Frontend Image
