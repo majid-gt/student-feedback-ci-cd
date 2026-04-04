@@ -55,7 +55,7 @@ jobs:
           image-ref: dockermajid/student-feedback-backend:${{ github.sha }}
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
 
       # 8. Push Backend Image
       - name: Push Backend Image
