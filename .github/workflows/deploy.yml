@@ -1,55 +1,107 @@
-name: CI - Build and Push docker images
+name: CI - DevSecOps Pipeline
+
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    build-and-push:
-        runs-on: ubuntu-latest
-        
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+  ci:
+    runs-on: ubuntu-latest
 
-            - name: Login to Docker hub
-              uses: docker/login-action@v3
-              with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
-                  
-            - name: Build and Push Backend Image
-              uses: docker/build-push-action@v5
-              with:
-                context: ./backend
-                push: true
-                tags: ${{ secrets.DOCKERHUB_USERNAME }}/student-feedback-backend:${{ github.sha }}
+    steps:
+      # 1. Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Build and Push Frontend Image
-              uses: docker/build-push-action@v5
-              with:
-                context: ./frontend
-                push: true
-                tags: ${{ secrets.DOCKERHUB_USERNAME }}/student-feedback-frontend:${{ github.sha }}
-            
-            - name: Checkout k8s repo
-              uses: actions/checkout@v4
-              with:
-                repository: majid-gt/student-feedback-k8s
-                token: ${{ secrets.GH_PAT }}
-                path: k8s-repo
+      # 2. Setup Node (for backend tests)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-            - name: Update image tags in k8s manifests
-              run: |
-                cd k8s-repo/k8s
-                sed -i "s|student-feedback-backend:.*|student-feedback-backend:${{ github.sha }}|" backend-deployment.yml
-                sed -i "s|student-feedback-frontend:.*|student-feedback-frontend:${{ github.sha }}|" frontend-deployment.yml
+      # 3. Install dependencies & run tests
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: |
+          npm install
+          npm test
 
-            - name: Commit and push changes
-              run: |
-                cd k8s-repo
-                git config user.name "github-actions"
-                git config user.email "actions@github.com"
-                git add .
-                git commit -m "Update image tags to ${{ github.sha }}"
-                git push
+      # 4. SonarQube Scan (SAST)
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # 5. Login to DockerHub
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 6. Build Backend Image
+      - name: Build Backend Image
+        run: |
+          docker build -t dockermajid/student-feedback-backend:${{ github.sha }} ./backend
+
+      # 7. Scan Backend Image (Trivy)
+      - name: Scan Backend Image
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          image-ref: dockermajid/student-feedback-backend:${{ github.sha }}
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      # 8. Push Backend Image
+      - name: Push Backend Image
+        run: |
+          docker push dockermajid/student-feedback-backend:${{ github.sha }}
+
+      # 9. Build Frontend Image
+      - name: Build Frontend Image
+        run: |
+          docker build -t dockermajid/student-feedback-frontend:${{ github.sha }} ./frontend
+
+      # 10. Scan Frontend Image
+      - name: Scan Frontend Image
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          image-ref: dockermajid/student-feedback-frontend:${{ github.sha }}
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      # 11. Push Frontend Image
+      - name: Push Frontend Image
+        run: |
+          docker push dockermajid/student-feedback-frontend:${{ github.sha }}
+
+      # 12. Checkout Infra Repo
+      - name: Checkout k8s repo
+        uses: actions/checkout@v4
+        with:
+          repository: majid-gt/student-feedback-k8s
+          token: ${{ secrets.GH_PAT }}
+          path: k8s-repo
+
+      # 13. Update image tags
+      - name: Update image tags in k8s manifests
+        run: |
+          cd k8s-repo/k8s
+          sed -i "s|student-feedback-backend:.*|student-feedback-backend:${{ github.sha }}|" backend-deployment.yml
+          sed -i "s|student-feedback-frontend:.*|student-feedback-frontend:${{ github.sha }}|" frontend-deployment.yml
+
+      # 14. Commit & Push
+      - name: Commit and push changes
+        run: |
+          cd k8s-repo
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update image tags to ${{ github.sha }}"
+          git push
